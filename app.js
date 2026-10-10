@@ -39,9 +39,25 @@ app.get('/students/add', (req, res) => {
   res.render('add');
 });
 
-// Activity 13: save student
 app.post('/students/add', (req, res) => {
-  const { student_id, first_name, last_name, course, year_level, email } = req.body;
+  let { student_id, first_name, last_name, course, year_level, email } = req.body;
+
+  student_id = (student_id || '').trim();
+  first_name = (first_name || '').trim();
+  last_name = (last_name || '').trim();
+  course = (course || '').trim();
+  email = (email || '').trim();
+  const year = Number(year_level);
+
+  if (!student_id || !first_name || !last_name || !course || !year_level || !email) {
+    return res.status(400).send('All fields are required');
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    return res.status(400).send('Invalid email');
+  }
+  if (!Number.isInteger(year) || year < 1 || year > 5) {
+    return res.status(400).send('Year level must be 1 to 5');
+  }
 
   const sql = `
     INSERT INTO students
@@ -49,10 +65,11 @@ app.post('/students/add', (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [student_id, first_name, last_name, course, year_level, email];
-
-  db.query(sql, values, (err) => {
+  db.query(sql, [student_id, first_name, last_name, course, year, email], (err) => {
     if (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).send('Student ID already exists');
+      }
       console.error(err);
       return res.status(500).send('Unable to save student');
     }
@@ -80,7 +97,65 @@ app.get('/students/search', (req, res) => {
     res.render('index', { students: results });
   });
 });
-// Activity 11: start server (laging nasa pinakababa)
+
+    
+app.post('/students/delete/:id', (req, res) => {
+  db.query('DELETE FROM students WHERE id = ?', [req.params.id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Unable to delete student');
+    }
+    res.redirect('/');
+  });
+});
+
+// Ipakita ang edit form
+app.get('/students/edit/:id', (req, res) => {
+  db.query('SELECT * FROM students WHERE id = ?', [req.params.id], (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(404).send('Student not found');
+    }
+    res.render('edit', { student: results[0] });
+  });
+});
+
+app.post('/students/edit/:id', (req, res) => {
+  let { student_id, first_name, last_name, course, year_level, email } = req.body;
+
+  student_id = (student_id || '').trim();
+  first_name = (first_name || '').trim();
+  last_name = (last_name || '').trim();
+  course = (course || '').trim();
+  email = (email || '').trim();
+  const year = Number(year_level);
+
+  if (!student_id || !first_name || !last_name || !course || !year_level || !email) {
+    return res.status(400).send('All fields are required');
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    return res.status(400).send('Invalid email');
+  }
+  if (!Number.isInteger(year) || year < 1 || year > 5) {
+    return res.status(400).send('Year level must be 1 to 5');
+  }
+
+  const sql = `
+    UPDATE students
+    SET student_id = ?, first_name = ?, last_name = ?, course = ?, year_level = ?, email = ?
+    WHERE id = ?
+  `;
+
+  db.query(sql, [student_id, first_name, last_name, course, year, email, req.params.id], (err) => {
+    if (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).send('Student ID already exists');
+      }
+      console.error(err);
+      return res.status(500).send('Unable to update student');
+    }
+    res.redirect('/');
+  });
+});
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
