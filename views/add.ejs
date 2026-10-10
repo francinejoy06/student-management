@@ -1,34 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Add Student</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Add Student</h1>
+  <nav class="navbar">
+    <h1>Student Management System</h1>
+    <div>
+      <a href="/">Students</a>
+      <a href="/students/add">Add Student</a>
+    </div>
+  </nav>
 
-  <form action="/students/add" method="POST">
-    <label>Student ID:</label><br>
-    <input type="text" name="student_id" required><br><br>
+  <div class="container">
+    <div class="card form-card">
+      <h2>Add Student</h2>
+      <form action="/students/add" method="POST">
+        <label>Student ID</label>
+        <input type="text" name="student_id" required>
 
-    <label>First Name:</label><br>
-    <input type="text" name="first_name" required><br><br>
+        <label>First Name</label>
+        <input type="text" name="first_name" required>
 
-    <label>Last Name:</label><br>
-    <input type="text" name="last_name" required><br><br>
+        <label>Last Name</label>
+        <input type="text" name="last_name" required>
 
-    <label>Course:</label><br>
-    <input type="text" name="course" required><br><br>
+        <label>Course</label>
+        <input type="text" name="course" required>
 
-    <label>Year Level:</label><br>
-    <input type="number" name="year_level" min="1" max="5" required><br><br>
+        <label>Year Level</label>
+        <input type="number" name="year_level" min="1" max="5" required>
 
-    <label>Email:</label><br>
-    <input type="email" name="email" required><br><br>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-    <button type="submit">Save Student</button>
-  </form>
-
-  <br>
-  <a href="/">Back to Student List</a>
+        <div class="form-actions">
+          <button class="btn" type="submit">Save Student</button>
+          <a class="btn btn-secondary" href="/">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
